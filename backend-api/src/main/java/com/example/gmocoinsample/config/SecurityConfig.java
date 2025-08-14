@@ -34,7 +34,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/api/health").permitAll() // ヘルスチェックエンドポイントは認証不要
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )

@@ -14,6 +14,9 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
+# Install curl for health check
+RUN apt-get update && apt-get install -y curl && apt-get clean
+
 # Copy the built JAR file from the build stage
 COPY --from=build /app/build/libs/*.jar app.jar
 
@@ -23,11 +26,15 @@ RUN groupadd -r spring && useradd -r -g spring spring
 # Set ownership of the application directory to the non-root user
 RUN chown -R spring:spring /app
 
+# Add startup script
+COPY --from=build /app/wait-for-keycloak.sh /app/wait-for-keycloak.sh
+RUN chmod +x /app/wait-for-keycloak.sh
+
 # Switch to the non-root user
 USER spring:spring
 
 # Expose the port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with startup script
+ENTRYPOINT ["/app/wait-for-keycloak.sh"]

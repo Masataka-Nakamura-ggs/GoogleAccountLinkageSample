@@ -6,9 +6,9 @@ OIDC(OpenID Connect)によるID連携を行うサンプルWebアプリケーシ�
 
 このプロジェクトは、Googleアカウント連携の代替として、Keycloak を使用したOIDC認証のサンプルアプリケーションです。以下の技術スタックを使用し、Docker Composeで一括して起動できます。
 
-- **IDプロバイダー(IdP)役 (OneAccount/GCIPの代役):** Keycloak
+- **IDプロバイダー(IdP)役 (OneAccount/GCIPの代役):** Keycloak 24.0.0
 - **バックエンド(RP)役 (GMOコインサーバーの代役):** Java + Spring Boot 3 + Gradle 8.5
-- **フロントエンド(RP)役 (GMOコイン画面の代役):** React + Next.js + Tailwind CSS
+- **フロントエンド(RP)役 (GMOコイン画面の代役):** React + Next.js 14 + Tailwind CSS
 
 ## システム構成
 
@@ -30,7 +30,7 @@ OIDC(OpenID Connect)によるID連携を行うサンプルWebアプリケーシ�
 ### 1. リポジトリをクローン
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Masataka-Nakamura-ggs/GoogleAccountLinkageSample.git
 cd GoogleAccountLinkageSample
 ```
 
@@ -154,7 +154,10 @@ GoogleAccountLinkageSample/
 ├── docs/
 │   └── Googleアカウント連携.md
 ├── keycloak/
-│   └── realm-export.json
+│   ├── realm-export.json
+│   └── realm-export-fixed.json
+├── agent_logs/
+│   └── 20250814_001_*.md
 ├── backend-api/
 │   ├── Dockerfile
 │   ├── build.gradle
@@ -170,6 +173,8 @@ GoogleAccountLinkageSample/
     ├── package.json
     ├── next.config.js
     ├── tailwind.config.ts
+    ├── components/
+    │   └── UserProfile.tsx
     └── app/
         ├── layout.tsx
         ├── page.tsx
@@ -185,6 +190,23 @@ GoogleAccountLinkageSample/
 1. **Authorization Code Flow with PKCE** を使用
 2. **JWT (ID Token + Access Token)** による認証
 3. **CORS** 対応によるクロスオリジンアクセス
+
+### 技術スタック
+
+- **フロントエンド:**
+  - Next.js 14 (App Router)
+  - NextAuth.js v4
+  - Tailwind CSS
+  - TypeScript
+
+- **バックエンド:**
+  - Spring Boot 3.2
+  - Spring Security OAuth2 Resource Server
+  - Java 17
+  - Gradle 8.5
+
+- **IDプロバイダー:**
+  - Keycloak 24.0.0
 
 ### セキュリティ設定
 

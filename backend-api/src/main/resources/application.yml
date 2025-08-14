@@ -16,11 +16,11 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:
           keycloak:
-            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/one-account-realm}
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/one-account-realm}
             user-name-attribute: preferred_username
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/one-account-realm}
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/one-account-realm}
 
 logging:
   level:
