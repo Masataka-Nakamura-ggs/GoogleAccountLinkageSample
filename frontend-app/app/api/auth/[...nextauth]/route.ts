@@ -1,31 +1,29 @@
-import NextAuth, { NextAuthOptions } from 'next-auth'
-import KeycloakProvider from 'next-auth/providers/keycloak'
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import KeycloakProvider from 'next-auth/providers/keycloak';
 
 const authOptions: NextAuthOptions = {
   providers: [
     KeycloakProvider({
       clientId: process.env.KEYCLOAK_CLIENT_ID!,
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
-      // サーバーサイドでは内部URLを使用
-      issuer: process.env.KEYCLOAK_INTERNAL_URL!,
-      // プロバイダーレベルでのURL設定
-      wellKnown: `${process.env.KEYCLOAK_INTERNAL_URL}/.well-known/openid-configuration`,
+      // 明示的にエンドポイントを指定
       authorization: {
-        // ブラウザからのアクセス用の外部URLを使用
         url: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/auth`,
         params: {
-          scope: "openid email profile",
+          scope: "openid profile email",
+          response_type: "code",
         },
       },
-      token: `${process.env.KEYCLOAK_INTERNAL_URL}/protocol/openid-connect/token`,
-      userinfo: `${process.env.KEYCLOAK_INTERNAL_URL}/protocol/openid-connect/userinfo`,
+      token: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+      userinfo: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/userinfo`,
+      issuer: process.env.KEYCLOAK_ISSUER!,
       profile(profile) {
         return {
           id: profile.sub,
           name: profile.name ?? profile.preferred_username,
           email: profile.email,
           image: profile.picture,
-        }
+        };
       },
     }),
   ],
@@ -70,4 +68,5 @@ const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions)
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
+
