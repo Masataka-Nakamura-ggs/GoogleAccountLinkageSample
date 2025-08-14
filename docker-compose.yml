@@ -1,6 +1,6 @@
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0
+    image: quay.io/keycloak/keycloak:24.0.0
     container_name: keycloak
     environment:
       KC_DB: dev-file
@@ -9,15 +9,12 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keycloak/realm-export-fixed.json:/opt/keycloak/data/import/realm-export.json
     command: ["start-dev", "--import-realm"]
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/realms/one-account-realm"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+    # ヘルスチェックを使用せず、起動時間を短くする
+    restart: on-failure:3
 
   backend-api:
     build:
@@ -30,8 +27,7 @@ services:
       - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/one-account-realm
       - CORS_ALLOWED_ORIGINS=http://localhost:3000
     depends_on:
-      keycloak:
-        condition: service_healthy
+      - keycloak
     networks:
       - app-network
 
