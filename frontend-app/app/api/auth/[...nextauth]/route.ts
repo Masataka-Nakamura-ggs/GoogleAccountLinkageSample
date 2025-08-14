@@ -1,29 +1,24 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
+import KeycloakProvider from 'next-auth/providers/keycloak'
 
 const authOptions: NextAuthOptions = {
   providers: [
-    {
-      id: 'keycloak',
-      name: 'Keycloak',
-      type: 'oauth',
-      authorization: {
-        url: 'http://localhost:8080/realms/one-account-realm/protocol/openid-connect/auth',
-        params: { 
-          scope: 'openid email profile',
-          response_type: 'code',
-        }
-      },
-      token: {
-        url: 'http://keycloak:8080/realms/one-account-realm/protocol/openid-connect/token'
-      },
-      userinfo: {
-        url: 'http://keycloak:8080/realms/one-account-realm/protocol/openid-connect/userinfo'
-      },
-      issuer: 'http://localhost:8080/realms/one-account-realm',
+    KeycloakProvider({
       clientId: process.env.KEYCLOAK_CLIENT_ID!,
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
-      idToken: true,
-      checks: ['pkce', 'state'],
+      // サーバーサイドでは内部URLを使用
+      issuer: process.env.KEYCLOAK_INTERNAL_URL!,
+      // プロバイダーレベルでのURL設定
+      wellKnown: `${process.env.KEYCLOAK_INTERNAL_URL}/.well-known/openid-configuration`,
+      authorization: {
+        // ブラウザからのアクセス用の外部URLを使用
+        url: `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/auth`,
+        params: {
+          scope: "openid email profile",
+        },
+      },
+      token: `${process.env.KEYCLOAK_INTERNAL_URL}/protocol/openid-connect/token`,
+      userinfo: `${process.env.KEYCLOAK_INTERNAL_URL}/protocol/openid-connect/userinfo`,
       profile(profile) {
         return {
           id: profile.sub,
@@ -32,7 +27,7 @@ const authOptions: NextAuthOptions = {
           image: profile.picture,
         }
       },
-    },
+    }),
   ],
   callbacks: {
     async jwt({ token, account }) {

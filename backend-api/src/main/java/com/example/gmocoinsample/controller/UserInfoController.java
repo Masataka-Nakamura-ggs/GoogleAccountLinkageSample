@@ -48,12 +48,4 @@ public class UserInfoController {
         
         return ResponseEntity.ok(profile);
     }
-
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> status = new HashMap<>();
-        status.put("status", "OK");
-        status.put("service", "GMO Coin Sample API");
-        return ResponseEntity.ok(status);
-    }
 }
