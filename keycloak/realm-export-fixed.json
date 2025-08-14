@@ -19,14 +19,14 @@
       "description": "GMO Coin Sample Application",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "",
+      "secret": "your-client-secret-here",
       "redirectUris": [
         "http://localhost:3000/*"
       ],
       "webOrigins": [
         "http://localhost:3000"
       ],
-      "publicClient": true,
+      "publicClient": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,

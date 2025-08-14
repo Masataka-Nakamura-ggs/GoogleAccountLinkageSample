@@ -6,12 +6,13 @@ services:
       KC_DB: dev-file
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: keycloak
+      KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 8080
       KC_HOSTNAME_STRICT: "false"
       KC_HTTP_ENABLED: "true"
       KC_HTTP_RELATIVE_PATH: "/"
-      KC_HOSTNAME_ADMIN_URL: http://keycloak:8080
+      KC_HOSTNAME_ADMIN_URL: http://localhost:8080
+      KC_FRONTEND_URL: http://localhost:8080
     ports:
       - "8080:8080"
     volumes:
@@ -55,15 +56,19 @@ services:
       - "3000:3000"
     environment:
       - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=$${NEXTAUTH_SECRET:-a-secure-random-string-for-development-only}
+      - NEXTAUTH_SECRET=a-secure-random-string-for-development-only
       - KEYCLOAK_CLIENT_ID=gmo-coin-client
-      - KEYCLOAK_CLIENT_SECRET=$${KEYCLOAK_CLIENT_SECRET:-your-client-secret-here}
+      - KEYCLOAK_CLIENT_SECRET=your-client-secret-here
       - KEYCLOAK_ISSUER=http://keycloak:8080/realms/one-account-realm
       - BACKEND_API_URL=http://localhost:8081
+      - NODE_ENV=development
+      - NEXTAUTH_DEBUG=true
     depends_on:
       - backend-api
     networks:
       - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 networks:
   app-network:

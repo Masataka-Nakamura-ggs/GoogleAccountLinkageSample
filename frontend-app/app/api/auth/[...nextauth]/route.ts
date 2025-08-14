@@ -6,14 +6,24 @@ const authOptions: NextAuthOptions = {
       id: 'keycloak',
       name: 'Keycloak',
       type: 'oauth',
-      wellKnown: `${process.env.KEYCLOAK_ISSUER}/.well-known/openid_configuration`,
-      authorization: { params: { scope: 'openid email profile' } },
+      authorization: {
+        url: 'http://localhost:8080/realms/one-account-realm/protocol/openid-connect/auth',
+        params: { 
+          scope: 'openid email profile',
+          response_type: 'code',
+        }
+      },
+      token: {
+        url: 'http://keycloak:8080/realms/one-account-realm/protocol/openid-connect/token'
+      },
+      userinfo: {
+        url: 'http://keycloak:8080/realms/one-account-realm/protocol/openid-connect/userinfo'
+      },
+      issuer: 'http://localhost:8080/realms/one-account-realm',
+      clientId: process.env.KEYCLOAK_CLIENT_ID!,
+      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
       idToken: true,
       checks: ['pkce', 'state'],
-      client: {
-        id: process.env.KEYCLOAK_CLIENT_ID!,
-        secret: process.env.KEYCLOAK_CLIENT_SECRET || '',
-      },
       profile(profile) {
         return {
           id: profile.sub,
@@ -49,7 +59,18 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
   },
-  debug: process.env.NODE_ENV === 'development',
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error('[NextAuth Error]', code, metadata)
+    },
+    warn(code) {
+      console.warn('[NextAuth Warning]', code)
+    },
+    debug(code, metadata) {
+      console.log('[NextAuth Debug]', code, metadata)
+    },
+  },
 }
 
 const handler = NextAuth(authOptions)
