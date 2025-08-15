@@ -1,40 +1,60 @@
+// プラグイン定義
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.4'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java' // Javaプロジェクト
+    id 'org.springframework.boot' version '3.5.4' // Spring Boot
+    id 'io.spring.dependency-management' version '1.1.4' // 依存関係管理
 }
 
+
+// グループIDとバージョン
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+
+// Javaバージョン指定
 java {
     sourceCompatibility = '17'
 }
 
+
+// Lombok用のコンパイル設定
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
 }
 
+
+// 依存関係取得元リポジトリ
 repositories {
     mavenCentral()
 }
 
+
+// 依存関係定義
 dependencies {
+    // Spring Boot Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    // OAuth2 クライアント
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    // OAuth2 リソースサーバー
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    // Beanバリデーション
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     
+    // Lombok（コンパイル時のみ）
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     
+    // テスト用依存関係
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
+
+// テストタスクの設定（JUnit Platform使用）
 tasks.named('test') {
     useJUnitPlatform()
 }
