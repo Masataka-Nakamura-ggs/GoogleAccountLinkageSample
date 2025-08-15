@@ -1,20 +1,20 @@
 # Dependencies
 backend-api/node_modules/
-frontend-app/node_modules/
+gmo-coin-app/node_modules/
 */node_modules/
 
 # Build outputs
 backend-api/build/
 backend-api/target/
-frontend-app/.next/
-frontend-app/out/
-frontend-app/dist/
+gmo-coin-app/.next/
+gmo-coin-app/out/
+gmo-coin-app/dist/
 
 # Logs
 *.log
 logs/
 backend-api/logs/
-frontend-app/.npm/
+gmo-coin-app/.npm/
 
 # Environment variables
 .env
@@ -57,35 +57,35 @@ backend-api/*.rar
 backend-api/hs_err_pid*
 
 # Next.js
-frontend-app/.next/
-frontend-app/out/
+gmo-coin-app/.next/
+gmo-coin-app/out/
 
 # Coverage directory used by tools like istanbul
-frontend-app/coverage/
+gmo-coin-app/coverage/
 
 # nyc test coverage
-frontend-app/.nyc_output
+gmo-coin-app/.nyc_output
 
 # Dependency directories
-frontend-app/jspm_packages/
+gmo-coin-app/jspm_packages/
 
 # TypeScript cache
-frontend-app/*.tsbuildinfo
+gmo-coin-app/*.tsbuildinfo
 
 # Optional npm cache directory
-frontend-app/.npm
+gmo-coin-app/.npm
 
 # Optional eslint cache
-frontend-app/.eslintcache
+gmo-coin-app/.eslintcache
 
 # Microbundle cache
-frontend-app/.rpt2_cache/
-frontend-app/.rts2_cache_cjs/
-frontend-app/.rts2_cache_es/
-frontend-app/.rts2_cache_umd/
+gmo-coin-app/.rpt2_cache/
+gmo-coin-app/.rts2_cache_cjs/
+gmo-coin-app/.rts2_cache_es/
+gmo-coin-app/.rts2_cache_umd/
 
 # Optional REPL history
-frontend-app/.node_repl_history
+gmo-coin-app/.node_repl_history
 
 # Output of 'npm pack'
 frontend-app/*.tgz

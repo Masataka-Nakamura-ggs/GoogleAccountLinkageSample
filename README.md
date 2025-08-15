@@ -96,7 +96,7 @@ lsof -i :8080
 
 ```bash
 # フロントエンドのログを確認
-docker-compose logs frontend-app
+docker-compose logs gmo-coin-app
 
 # ポート3000が使用されていないか確認
 lsof -i :3000
@@ -117,7 +117,7 @@ lsof -i :8081
 1. Keycloakが完全に起動しているか確認
 2. http://localhost:8080/realms/one-account-realm/.well-known/openid_configuration にアクセスして設定を確認
 3. ブラウザのキャッシュをクリア
-4. フロントエンドのログを確認: `docker-compose logs frontend-app`
+4. フロントエンドのログを確認: `docker-compose logs gmo-coin-app`
 
 ### API エンドポイントが呼び出せない場合
 
@@ -149,7 +149,7 @@ docker-compose down -v
 ### フロントエンド（開発モード）
 
 ```bash
-cd frontend-app
+cd gmo-coin-app
 npm install
 npm run dev
 ```
@@ -173,7 +173,7 @@ docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin
 フロントエンド開発時は `.env.local` ファイルに以下の設定が必要です：
 
 ```
-# frontend-app/.env.local
+# gmo-coin-app/.env.local
 KEYCLOAK_INTERNAL_URL=http://localhost:8080/realms/one-account-realm
 ```
 
@@ -206,7 +206,7 @@ GoogleAccountLinkageSample/
 │       │       ├── HealthCheckController.java
 │       │       └── UserInfoController.java
 │       └── resources/application.yml
-└── frontend-app/
+└── gmo-coin-app/
     ├── Dockerfile
     ├── package.json
     ├── next.config.js

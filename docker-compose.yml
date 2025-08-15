@@ -43,15 +43,15 @@ services:
       retries: 3
       start_period: 30s
 
-  frontend-app:
+  gmo-coin-app:
     build:
-      context: ./frontend-app
+      context: ./gmo-coin-app
       dockerfile: Dockerfile
-    container_name: frontend-app
+    container_name: gmo-coin-app
     ports:
       - "3000:3000"
     env_file:
-      - ./frontend-app/.env.local
+      - ./gmo-coin-app/.env.local
     depends_on:
       - backend-api
     networks:
