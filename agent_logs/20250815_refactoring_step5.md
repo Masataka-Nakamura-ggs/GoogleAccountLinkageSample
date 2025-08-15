@@ -1,11 +1,19 @@
+# 5. メインページコンポーネントのリファクタリング
+
+最後に、メインページのコンポーネントをリファクタリングして、新しく作成したコンポーネントとフックを利用します。
+
+## frontend-app/app/page.tsx
+
+```typescript
 'use client'
 
-import { ApiStatusCard } from '../components/ui/ApiStatusCard';
-import { BackendApiCard } from '../components/ui/BackendApiCard';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { UserInfoCard } from '../components/ui/UserInfoCard';
-import { WelcomeCard } from '../components/ui/WelcomeCard';
+import React from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { WelcomeCard } from '../components/ui/WelcomeCard';
+import { UserInfoCard } from '../components/ui/UserInfoCard';
+import { BackendApiCard } from '../components/ui/BackendApiCard';
+import { ApiStatusCard } from '../components/ui/ApiStatusCard';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 /**
  * メインページコンポーネント
@@ -57,3 +65,13 @@ export default function Home() {
     </div>
   );
 }
+```
+
+メインページコンポーネントを大幅にリファクタリングしました。変更点：
+
+1. 状態管理をカスタムフックに委譲し、コンポーネントをシンプルに
+2. UIを個別のコンポーネントに分割
+3. コンソールログの削除
+4. イベントハンドラの簡素化
+
+これにより、メインコンポーネントは「何を表示するか」という役割に集中し、各UIコンポーネントやカスタムフックがそれぞれの責務を果たす構造になりました。
