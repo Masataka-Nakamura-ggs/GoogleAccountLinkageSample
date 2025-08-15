@@ -10,6 +10,8 @@ OIDC(OpenID Connect)によるID連携を行うサンプルWebアプリケーシ�
 - **バックエンド(RP)役 (GMOコインサーバーの代役):** Java + Spring Boot 3 + Gradle 8.5
 - **フロントエンド(RP)役 (GMOコイン画面の代役):** React + Next.js 14 + Tailwind CSS
 
+最終更新日: 2025年8月15日
+
 ## システム構成
 
 ```
@@ -159,6 +161,22 @@ cd backend-api
 ./gradlew bootRun
 ```
 
+### Keycloak（開発モード）
+
+```bash
+# Dockerで単体起動
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:24.0.0 start-dev
+```
+
+### 環境変数設定（開発時）
+
+フロントエンド開発時は `.env.local` ファイルに以下の設定が必要です：
+
+```
+# frontend-app/.env.local
+KEYCLOAK_INTERNAL_URL=http://localhost:8080/realms/one-account-realm
+```
+
 ## プロジェクト構造
 
 ```
@@ -199,7 +217,6 @@ GoogleAccountLinkageSample/
     ├── components/
     │   └── UserProfile.tsx
     ├── types/
-    │   └── next-auth.d.ts
     └── app/
         ├── layout.tsx
         ├── page.tsx
@@ -213,7 +230,7 @@ GoogleAccountLinkageSample/
 
 ## 技術詳細
 
-### 認証フロー
+## 認証フロー
 
 1. **Authorization Code Flow with PKCE** を使用
 2. **JWT (ID Token + Access Token)** による認証
@@ -223,7 +240,7 @@ GoogleAccountLinkageSample/
 ### 技術スタック
 
 - **フロントエンド:**
-  - Next.js 14 (App Router)
+  - Next.js 14.2.31 (App Router) - セキュリティパッチ適用済み
   - カスタムKeycloak認証API
   - Tailwind CSS
   - TypeScript
@@ -260,3 +277,14 @@ GoogleAccountLinkageSample/
 ## ライセンス
 
 このプロジェクトはサンプルコードであり、学習・検証目的で使用してください。
+
+## 更新履歴
+
+### 2025年8月15日
+- Next.jsをセキュリティアップデート (14.2.31)
+- README.mdを最新情報で更新
+
+### 2025年8月14日
+- 初期バージョンリリース
+- 基本的な認証フロー実装
+- Docker Composeによる一括起動環境構築
