@@ -1,5 +1,7 @@
 # Use the official Node.js image as the build stage
-FROM node:20-alpine AS build
+FROM node:22.18.0-alpine AS build
+# パッケージを最新化して脆弱性を修正
+RUN apk upgrade --no-cache
 
 WORKDIR /app
 
@@ -16,7 +18,9 @@ COPY . .
 RUN npm run build
 
 # Use the official Node.js runtime image for the final stage
-FROM node:20-alpine AS runtime
+FROM node:22.18.0-alpine AS runtime
+# パッケージを最新化して脆弱性を修正
+RUN apk upgrade --no-cache
 
 WORKDIR /app
 

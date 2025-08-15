@@ -47,6 +47,8 @@ dependencies {
     // Lombok（コンパイル時のみ）
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     
     // テスト用依存関係
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
