@@ -59,6 +59,22 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  oneaccount-app:
+    build:
+      context: ./oneaccount-app
+      dockerfile: Dockerfile
+    container_name: oneaccount-app
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./oneaccount-app/.env.local
+    depends_on:
+      - keycloak
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 networks:
   app-network:
     driver: bridge

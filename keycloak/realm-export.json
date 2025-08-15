@@ -24,7 +24,8 @@
         "http://localhost:3000/api/keycloak/callback"
       ],
       "webOrigins": [
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://localhost:3001"
       ],
       "publicClient": false,
       "standardFlowEnabled": true,
