@@ -20,12 +20,20 @@ OIDC(OpenID Connect)によるID連携を行うサンプルWebアプリケーシ�
 │   (Next.js)     │◄──►│   (Spring Boot) │◄──►│   (IdP)         │
 │   Port: 3000    │    │   Port: 8081    │    │   Port: 8080    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
+          ▲
+          │
+          ▼
+┌─────────────────┐
+│  OneAccount App │
+│   (Next.js)     │
+│   Port: 3001    │
+└─────────────────┘
 ```
 
 ## 前提条件
 
 - Docker Desktop がインストールされていること
-- ポート 3000, 8080, 8081 が使用可能であること
+- ポート 3000, 3001, 8080, 8081 が使用可能であること
 
 ## クイックスタート
 
@@ -39,7 +47,7 @@ cd GoogleAccountLinkageSample
 ### 2. アプリケーションを起動
 
 ```bash
-docker-compose up --build
+docker compose up -d --build
 ```
 
 初回起動時は、各コンテナのビルドに時間がかかります（5-10分程度）。
@@ -48,13 +56,14 @@ docker-compose up --build
 
 以下のURLにアクセスしてください：
 
-- **フロントエンド:** http://localhost:3000
+- **メインフロントエンド (GMOコイン):** http://localhost:3000
+- **OneAccountアプリ:** http://localhost:3001
 - **Keycloak管理画面:** http://localhost:8080 (admin/admin)
 - **バックエンドAPI:** http://localhost:8081/api/health
 
 ## 使用方法
 
-### 基本的な認証フロー
+### 基本的な認証フロー（GMOコインアプリ）
 
 1. http://localhost:3000 にアクセス
 2. 「OneAccountでログイン」ボタンをクリック
@@ -63,6 +72,12 @@ docker-compose up --build
    - **パスワード:** `password`
 4. 認証成功後、フロントエンドにリダイレクトされ、ユーザー情報が表示される
 5. バックエンドAPIから追加のユーザー情報も自動的に取得されて表示される
+
+### OneAccountアプリ（別フロントエンド）
+
+http://localhost:3001 にアクセスすると、シンプルなログイン画面が表示されます。
+このアプリは、Keycloakと連携するセカンドフロントエンドとして動作し、
+認証失敗時の遷移先としても利用できます。
 
 ### テストユーザー
 
@@ -79,6 +94,17 @@ docker-compose up --build
 ✅ **バックエンド認証:** Spring SecurityによるJWT検証  
 ✅ **API連携:** フロントエンドからバックエンドへのトークン付きリクエスト
 ✅ **ユーザー情報表示:** IDプロバイダーから取得した情報の表示
+✅ **複数フロントエンド:** GMOコインアプリとOneAccountアプリの連携
+
+## UIコンポーネント構成
+
+gmo-coin-appは以下のUIコンポーネントに分割されています：
+
+- **WelcomeCard:** 未認証時のログイン画面
+- **UserInfoCard:** 認証済みユーザー情報の表示
+- **BackendApiCard:** バックエンドAPIから取得した情報の表示
+- **ApiStatusCard:** バックエンドAPIの接続状態表示
+- **LoadingSpinner:** データ読み込み中の表示
 
 ## トラブルシューティング
 
@@ -86,7 +112,7 @@ docker-compose up --build
 
 ```bash
 # コンテナのログを確認
-docker-compose logs keycloak
+docker compose logs keycloak
 
 # ポート8080が使用されていないか確認
 lsof -i :8080
@@ -95,18 +121,22 @@ lsof -i :8080
 ### フロントエンドが起動しない場合
 
 ```bash
-# フロントエンドのログを確認
-docker-compose logs gmo-coin-app
+# GMOコインアプリのログを確認
+docker compose logs gmo-coin-app
 
-# ポート3000が使用されていないか確認
+# OneAccountアプリのログを確認
+docker compose logs oneaccount-app
+
+# ポート3000/3001が使用されていないか確認
 lsof -i :3000
+lsof -i :3001
 ```
 
 ### バックエンドが起動しない場合
 
 ```bash
 # バックエンドのログを確認
-docker-compose logs backend-api
+docker compose logs backend-api
 
 # ポート8081が使用されていないか確認
 lsof -i :8081
@@ -115,9 +145,9 @@ lsof -i :8081
 ### 認証エラーが発生する場合
 
 1. Keycloakが完全に起動しているか確認
-2. http://localhost:8080/realms/one-account-realm/.well-known/openid_configuration にアクセスして設定を確認
+2. http://localhost:8080/realms/one-account-realm/.well-known/openid-configuration にアクセスして設定を確認
 3. ブラウザのキャッシュをクリア
-4. フロントエンドのログを確認: `docker-compose logs gmo-coin-app`
+4. フロントエンドのログを確認: `docker compose logs gmo-coin-app`
 
 ### API エンドポイントが呼び出せない場合
 
@@ -136,10 +166,10 @@ curl -I http://localhost:8080/realms/one-account-realm/protocol/openid-connect/a
 
 ```bash
 # アプリケーションを停止
-docker-compose down
+docker compose down
 
 # ボリュームも含めて削除（データもリセット）
-docker-compose down -v
+docker compose down -v
 ```
 
 ## 開発モード
@@ -149,7 +179,13 @@ docker-compose down -v
 ### フロントエンド（開発モード）
 
 ```bash
+# GMOコインアプリ
 cd gmo-coin-app
+npm install
+npm run dev
+
+# OneAccountアプリ
+cd oneaccount-app
 npm install
 npm run dev
 ```
@@ -175,6 +211,9 @@ docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin
 ```
 # gmo-coin-app/.env.local
 KEYCLOAK_INTERNAL_URL=http://localhost:8080/realms/one-account-realm
+
+# oneaccount-app/.env.local
+KEYCLOAK_INTERNAL_URL=http://localhost:8080/realms/one-account-realm
 ```
 
 ## プロジェクト構造
@@ -188,11 +227,13 @@ GoogleAccountLinkageSample/
 │   └── 20250814_001.md
 ├── docs/
 │   ├── Googleアカウント連携.md
-│   └── 20250814_001_nextauth_error_investigation.md
+│   ├── 20250814_001_nextauth_error_investigation.md
+│   └── 追加要望_20250815.md
 ├── keycloak/
 │   └── realm-export.json
 ├── agent_logs/
-│   └── 20250814_001_*.md
+│   ├── 20250814_001_*.md
+│   └── 20250815_refactoring_*.md
 ├── backend-api/
 │   ├── Dockerfile
 │   ├── build.gradle
@@ -206,26 +247,56 @@ GoogleAccountLinkageSample/
 │       │       ├── HealthCheckController.java
 │       │       └── UserInfoController.java
 │       └── resources/application.yml
-└── gmo-coin-app/
+├── gmo-coin-app/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── next.config.js
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
+│   ├── next-env.d.ts
+│   ├── postcss.config.js
+│   ├── hooks/
+│   │   └── useAuth.ts
+│   ├── components/
+│   │   ├── UserProfile.tsx
+│   │   └── ui/
+│   │       ├── ApiStatusCard.tsx
+│   │       ├── BackendApiCard.tsx
+│   │       ├── LoadingSpinner.tsx
+│   │       ├── UserInfoCard.tsx
+│   │       └── WelcomeCard.tsx
+│   ├── services/
+│   │   └── authService.ts
+│   ├── types/
+│   │   └── auth.ts
+│   └── app/
+│       ├── layout.tsx
+│       ├── page.tsx
+│       ├── globals.css
+│       └── api/
+│           └── keycloak/
+│               ├── auth/route.ts
+│               ├── callback/route.ts
+│               └── user/route.ts
+└── oneaccount-app/
     ├── Dockerfile
     ├── package.json
     ├── next.config.js
-    ├── tailwind.config.ts
+    ├── tailwind.config.js
     ├── tsconfig.json
     ├── next-env.d.ts
     ├── postcss.config.js
+    ├── app/
+    │   ├── layout.tsx
+    │   ├── page.tsx
+    │   ├── globals.css
+    │   └── api/
+    │       └── keycloak/
+    │           ├── auth/route.ts
+    │           └── callback/route.ts
     ├── components/
-    │   └── UserProfile.tsx
-    ├── types/
-    └── app/
-        ├── layout.tsx
-        ├── page.tsx
-        ├── globals.css
-        └── api/
-            └── keycloak/
-                ├── auth/route.ts
-                ├── callback/route.ts
-                └── user/route.ts
+    ├── services/
+    └── types/
 ```
 
 ## 技術詳細
@@ -244,6 +315,7 @@ GoogleAccountLinkageSample/
   - カスタムKeycloak認証API
   - Tailwind CSS
   - TypeScript
+  - カスタムフックによる状態管理
 
 - **バックエンド:**
   - Spring Boot 3.2
@@ -262,17 +334,26 @@ GoogleAccountLinkageSample/
 
 ### 認証APIエンドポイント
 
-フロントエンドには以下のカスタム認証APIが実装されています：
-
+#### GMOコインアプリ（gmo-coin-app）
 - **`/api/keycloak/auth`** - 認証開始エンドポイント（Keycloakへのリダイレクト）
 - **`/api/keycloak/callback`** - Keycloakからのコールバック処理
 - **`/api/keycloak/user`** - ユーザー情報取得・認証状態確認・ログアウト
 
-バックエンドAPIエンドポイント：
+#### OneAccountアプリ（oneaccount-app）
+- **`/api/keycloak/auth`** - 認証開始エンドポイント
+- **`/api/keycloak/callback`** - コールバック処理
 
+#### バックエンドAPI
 - **`/api/health`** - ヘルスチェック
 - **`/api/user`** - 認証済みユーザー情報の取得
 - **`/api/profile`** - ユーザープロフィール情報の取得
+
+## 今後の拡張予定
+
+- Keycloak認証失敗時にOneAccountアプリへの遷移機能
+- OneAccountアプリのUI機能強化
+- テスト環境の整備
+- 詳細は `docs/追加要望_20250815.md` を参照
 
 ## ライセンス
 
@@ -282,6 +363,9 @@ GoogleAccountLinkageSample/
 
 ### 2025年8月15日
 - Next.jsをセキュリティアップデート (14.2.31)
+- UIコンポーネントをリファクタリング（WelcomeCard, UserInfoCard, BackendApiCard, ApiStatusCardなど）
+- 状態管理をカスタムフックに分離
+- OneAccountアプリを追加（セカンドフロントエンド）
 - README.mdを最新情報で更新
 
 ### 2025年8月14日

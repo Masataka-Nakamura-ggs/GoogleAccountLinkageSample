@@ -23,7 +23,7 @@ export default function RootLayout({
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center">
                   <h1 className="text-xl font-semibold text-gray-900">
-                    GMO Coin Sample
+                      <span className="text-3xl font-extrabold text-indigo-600 drop-shadow-md tracking-wide">GMO Coin Sample</span>
                   </h1>
                   <span className="ml-2 text-sm text-gray-500">
                     (OneAccount連携デモ)
