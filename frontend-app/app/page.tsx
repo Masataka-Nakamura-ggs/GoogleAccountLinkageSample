@@ -11,6 +11,7 @@ interface UserInfo {
 }
 
 export default function Home() {
+  console.log('=== /app/pages ===');
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [backendUserInfo, setBackendUserInfo] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -67,14 +68,18 @@ export default function Home() {
   }
 
   const fetchBackendUserInfo = async () => {
+    console.log('Fetching backend user info...')
     setLoading(true)
     try {
+      console.log('Making request to backend API...')
       const response = await fetch('http://localhost:8081/api/user', {
         credentials: 'include'
       })
 
+      console.log('Backend user info response:', response.status);
       if (response.ok) {
         const data = await response.json()
+        console.log('Backend user info:', data)
         setBackendUserInfo(data)
       } else {
         console.error('Failed to fetch backend user info:', response.statusText)
