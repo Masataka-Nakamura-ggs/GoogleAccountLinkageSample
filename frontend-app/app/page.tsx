@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+// Keycloakユーザー情報型定義
 interface UserInfo {
   sub: string;
   name?: string;
@@ -10,13 +11,19 @@ interface UserInfo {
   [key: string]: any;
 }
 
+// メインページコンポーネント
 export default function Home() {
   console.log('=== /app/pages ===');
+  // ユーザー情報（Keycloak）
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  // バックエンドAPIから取得したユーザー情報
   const [backendUserInfo, setBackendUserInfo] = useState(null)
+  // バックエンドAPI取得中フラグ
   const [loading, setLoading] = useState(false)
+  // 認証済みフラグ
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [authChecked, setAuthChecked] = useState(false) // 認証チェック完了フラグ
+  // 認証チェック完了フラグ
+  const [authChecked, setAuthChecked] = useState(false)
 
   // ページロード時にユーザー情報を確認
   useEffect(() => {
@@ -42,6 +49,17 @@ export default function Home() {
     checkAuthStatus()
   }, [authChecked])
 
+  // 認証状態をAPIで確認
+  /**
+   * 現在のユーザーの認証状態を `/api/keycloak/user` エンドポイントにリクエストして確認します。
+   * 
+   * - レスポンスが成功（`response.ok`）の場合、ユーザー情報と認証状態を更新します。
+   * - 未認証またはエラーの場合、ユーザー情報と認証状態をリセットします。
+   * - いずれの場合も認証チェック完了フラグを更新します。
+   * 
+   * @async
+   * @returns {Promise<void>} 認証状態の確認と状態更新が完了した時に解決されます。
+   */
   const checkAuthStatus = async () => {
     try {
       console.log('Checking auth status...');
@@ -67,6 +85,7 @@ export default function Home() {
     }
   }
 
+  // バックエンドAPIからユーザー情報取得
   const fetchBackendUserInfo = async () => {
     console.log('Fetching backend user info...')
     setLoading(true)
@@ -91,6 +110,7 @@ export default function Home() {
     }
   }
 
+  // ログインボタン押下時の処理
   const handleLogin = () => {
     console.log('Login button clicked!')
     console.log('Redirecting to:', '/api/keycloak/auth')
@@ -104,6 +124,7 @@ export default function Home() {
     }
   }
 
+  // ログアウト処理
   const handleLogout = async () => {
     try {
       await fetch('/api/keycloak/user', { method: 'DELETE' })
@@ -116,12 +137,14 @@ export default function Home() {
     }
   }
 
+  // 認証済みかつユーザー情報があればバックエンドAPI連携
   useEffect(() => {
     if (isAuthenticated && userInfo) {
       fetchBackendUserInfo()
     }
   }, [isAuthenticated, userInfo])
 
+  // ローディング表示
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -130,6 +153,7 @@ export default function Home() {
     )
   }
 
+  // 未認証時の表示
   if (!isAuthenticated) {
     return (
       <div className="max-w-md mx-auto mt-8">
@@ -157,6 +181,7 @@ export default function Home() {
     )
   }
 
+  // 認証済み時の表示
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* ウェルカムセクション */}

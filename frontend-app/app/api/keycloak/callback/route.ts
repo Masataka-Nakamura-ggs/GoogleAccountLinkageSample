@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Keycloak OAuth2 コールバックAPI (GET)
 export async function GET(request: NextRequest) {
   console.log('=== /api/keycloak/callback GET request ===');
   console.log('Request URL:', request.nextUrl.href);
   
+  // URLパラメータ取得
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const state = searchParams.get('state');
@@ -18,6 +20,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`http://localhost:3000/?error=${error}`);
   }
   
+  // 必須パラメータチェック
   if (!code || !state) {
     console.log('Missing required parameters - code:', !!code, 'state:', !!state);
     return NextResponse.redirect('http://localhost:3000/?error=missing_parameters');
@@ -36,16 +39,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect('http://localhost:3000/?error=invalid_state');
   }
   
+  // code_verifier存在チェック
   if (!codeVerifier) {
     console.log('Missing code verifier cookie');
     return NextResponse.redirect('http://localhost:3000/?error=missing_code_verifier');
   }
   
   try {
-    // トークンエンドポイントにリクエスト
+    // KeycloakトークンエンドポイントURL取得
     const keycloakInternalUrl = process.env.KEYCLOAK_INTERNAL_URL || 'http://host.docker.internal:8080/realms/one-account-realm';
     console.log('Using Keycloak internal URL:', keycloakInternalUrl);
     
+    // トークンエンドポイントにリクエスト
     const tokenResponse = await fetch(`${keycloakInternalUrl}/protocol/openid-connect/token`, {
       method: 'POST',
       headers: {
@@ -61,38 +66,17 @@ export async function GET(request: NextRequest) {
       }),
     });
     
+    // トークン取得失敗時
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Token exchange failed:', errorText);
       return NextResponse.redirect('http://localhost:3000/?error=token_exchange_failed');
     }
     
+    // トークン取得成功時
     const tokens = await tokenResponse.json();
     console.log('Token exchange successful, access_token exists:', !!tokens.access_token);
     console.log('Full token response:', JSON.stringify(tokens, null, 2));
-    
-    // // ユーザー情報を取得
-    // const userInfoUrl = `${keycloakInternalUrl}/protocol/openid-connect/userinfo`;
-    // console.log('UserInfo request URL:', userInfoUrl);
-    // console.log('Access token (first 20 chars):', tokens.access_token?.substring(0, 20));
-    
-    // const userInfoResponse = await fetch(userInfoUrl, {
-    //   headers: {
-    //     'Authorization': `Bearer ${tokens.access_token}`,
-    //   },
-    // });
-    
-    // if (!userInfoResponse.ok) {
-    //   const errorText = await userInfoResponse.text();
-    //   console.error('UserInfo request failed:', {
-    //     status: userInfoResponse.status,
-    //     statusText: userInfoResponse.statusText,
-    //     body: errorText
-    //   });
-    //   return NextResponse.redirect('http://localhost:3000/?error=userinfo_failed');
-    // }
-    
-    // const userInfo = await userInfoResponse.json();
   
     // IDトークンからユーザー情報を取得
     const idTokenPayload = JSON.parse(Buffer.from(tokens.id_token.split('.')[1], 'base64').toString());
@@ -131,6 +115,7 @@ export async function GET(request: NextRequest) {
     return response;
     
   } catch (error) {
+    // 例外発生時はエラー画面へリダイレクト
     console.error('OAuth callback error:', error);
     return NextResponse.redirect('http://localhost:3000/?error=internal_error');
   }
