@@ -1,4 +1,4 @@
-package com.example.gmocoinsample.config;
+package com.example.oneaccountsample.config;
 
 /**
  * Spring Securityの設定クラス。

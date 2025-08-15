@@ -1,4 +1,4 @@
-package com.example.gmocoinsample.config;
+package com.example.oneaccountsample.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

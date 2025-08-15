@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: gmo-coin-sample
+    name: one-account-sample
   security:
     oauth2:
       resourceserver:

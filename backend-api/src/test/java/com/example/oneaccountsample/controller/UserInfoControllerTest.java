@@ -1,4 +1,4 @@
-package com.example.gmocoinsample.controller;
+package com.example.oneaccountsample.controller;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;

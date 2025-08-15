@@ -1,4 +1,4 @@
-package com.example.gmocoinsample.config;
+package com.example.oneaccountsample.config;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;

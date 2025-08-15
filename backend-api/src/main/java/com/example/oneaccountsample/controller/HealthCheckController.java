@@ -1,4 +1,4 @@
-package com.example.gmocoinsample.controller;
+package com.example.oneaccountsample.controller;
 
 /**
  * ヘルスチェック用APIコントローラー。
