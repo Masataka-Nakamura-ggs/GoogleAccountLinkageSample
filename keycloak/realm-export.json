@@ -21,7 +21,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "your-client-secret-here",
       "redirectUris": [
-        "http://localhost:3000/api/auth/callback/keycloak"
+        "http://localhost:3000/api/keycloak/callback"
       ],
       "webOrigins": [
         "http://localhost:3000"
@@ -46,6 +46,20 @@
         "offline_access",
         "microprofile-jwt"
       ],
+      "protocolMappers": [
+        {
+          "name": "audience-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "included.client.audience": "gmo-coin-client",
+            "jsonType.label": "String"
+          }
+        }
+      ],
       "attributes": {
         "saml.assertion.signature": "false",
         "saml.multivalued.roles": "false",
@@ -60,7 +74,8 @@
         "saml.authnstatement": "false",
         "display.on.consent.screen": "false",
         "saml.onetimeuse.condition": "false",
-        "post.logout.redirect.uris": "+"
+        "post.logout.redirect.uris": "+",
+        "pkce.code.challenge.method": "S256"
       }
     }
   ],

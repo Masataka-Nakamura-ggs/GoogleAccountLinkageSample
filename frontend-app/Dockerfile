@@ -20,21 +20,16 @@ FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies  
-RUN npm ci --only=production && npm cache clean --force
-
 # Copy the built application from the build stage
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/next.config.js ./next.config.js
-# If public directory exists, copy it
-RUN mkdir -p ./public
+COPY --from=build /app/.next/standalone .
+COPY --from=build /app/.next/static ./.next/static
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Install curl 
+RUN apk add --no-cache curl
 
 # Change ownership
 RUN chown -R nextjs:nodejs /app
@@ -48,4 +43,4 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 # Run the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

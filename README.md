@@ -60,7 +60,7 @@ docker-compose up --build
    - **ユーザー名:** `user01`
    - **パスワード:** `password`
 4. 認証成功後、フロントエンドにリダイレクトされ、ユーザー情報が表示される
-5. 「ユーザー情報を取得」ボタンでバックエンドAPIとの連携をテスト
+5. バックエンドAPIから追加のユーザー情報も自動的に取得されて表示される
 
 ### テストユーザー
 
@@ -73,8 +73,8 @@ docker-compose up --build
 
 ## 動作確認ポイント
 
-✅ **フロントエンド認証:** NextAuth.jsによるOIDC認証
-✅ **バックエンド認証:** Spring SecurityによるJWT検証
+✅ **フロントエンド認証:** カスタムKeycloak APIによるOIDC認証
+✅ **バックエンド認証:** Spring SecurityによるJWT検証  
 ✅ **API連携:** フロントエンドからバックエンドへのトークン付きリクエスト
 ✅ **ユーザー情報表示:** IDプロバイダーから取得した情報の表示
 
@@ -115,6 +115,20 @@ lsof -i :8081
 1. Keycloakが完全に起動しているか確認
 2. http://localhost:8080/realms/one-account-realm/.well-known/openid_configuration にアクセスして設定を確認
 3. ブラウザのキャッシュをクリア
+4. フロントエンドのログを確認: `docker-compose logs frontend-app`
+
+### API エンドポイントが呼び出せない場合
+
+```bash
+# フロントエンドの認証API確認
+curl -I http://localhost:3000/api/keycloak/auth
+
+# バックエンドのヘルスチェック
+curl -I http://localhost:8081/api/health
+
+# Keycloakのエンドポイント確認
+curl -I http://localhost:8080/realms/one-account-realm/protocol/openid-connect/auth
+```
 
 ## 停止方法
 
@@ -151,36 +165,50 @@ cd backend-api
 GoogleAccountLinkageSample/
 ├── README.md
 ├── docker-compose.yml
+├── .gitignore
+├── Issue/
+│   └── 20250814_001.md
 ├── docs/
-│   └── Googleアカウント連携.md
+│   ├── Googleアカウント連携.md
+│   └── 20250814_001_nextauth_error_investigation.md
 ├── keycloak/
-│   ├── realm-export.json
-│   └── realm-export-fixed.json
+│   └── realm-export.json
 ├── agent_logs/
 │   └── 20250814_001_*.md
 ├── backend-api/
 │   ├── Dockerfile
 │   ├── build.gradle
 │   ├── settings.gradle
+│   ├── wait-for-keycloak.sh
 │   └── src/main/
 │       ├── java/com/example/gmocoinsample/
 │       │   ├── GmoCoinSampleApplication.java
 │       │   ├── config/SecurityConfig.java
-│       │   └── controller/UserInfoController.java
+│       │   └── controller/
+│       │       ├── HealthCheckController.java
+│       │       └── UserInfoController.java
 │       └── resources/application.yml
 └── frontend-app/
     ├── Dockerfile
     ├── package.json
     ├── next.config.js
     ├── tailwind.config.ts
+    ├── tsconfig.json
+    ├── next-env.d.ts
+    ├── postcss.config.js
     ├── components/
     │   └── UserProfile.tsx
+    ├── types/
+    │   └── next-auth.d.ts
     └── app/
         ├── layout.tsx
         ├── page.tsx
-        ├── providers.tsx
         ├── globals.css
-        └── api/auth/[...nextauth]/route.ts
+        └── api/
+            └── keycloak/
+                ├── auth/route.ts
+                ├── callback/route.ts
+                └── user/route.ts
 ```
 
 ## 技術詳細
@@ -190,12 +218,13 @@ GoogleAccountLinkageSample/
 1. **Authorization Code Flow with PKCE** を使用
 2. **JWT (ID Token + Access Token)** による認証
 3. **CORS** 対応によるクロスオリジンアクセス
+4. **カスタムKeycloak API** による認証処理（NextAuth.jsは使用していません）
 
 ### 技術スタック
 
 - **フロントエンド:**
   - Next.js 14 (App Router)
-  - NextAuth.js v4
+  - カスタムKeycloak認証API
   - Tailwind CSS
   - TypeScript
 
@@ -210,9 +239,23 @@ GoogleAccountLinkageSample/
 
 ### セキュリティ設定
 
-- **フロントエンド:** NextAuth.js の公式プロバイダーを使用
+- **フロントエンド:** カスタムKeycloak APIエンドポイント（/api/keycloak/*）
 - **バックエンド:** Spring Security OAuth2 Resource Server
 - **トークン検証:** JWTの署名検証とクレーム検証
+
+### 認証APIエンドポイント
+
+フロントエンドには以下のカスタム認証APIが実装されています：
+
+- **`/api/keycloak/auth`** - 認証開始エンドポイント（Keycloakへのリダイレクト）
+- **`/api/keycloak/callback`** - Keycloakからのコールバック処理
+- **`/api/keycloak/user`** - ユーザー情報取得・認証状態確認・ログアウト
+
+バックエンドAPIエンドポイント：
+
+- **`/api/health`** - ヘルスチェック
+- **`/api/user`** - 認証済みユーザー情報の取得
+- **`/api/profile`** - ユーザープロフィール情報の取得
 
 ## ライセンス
 

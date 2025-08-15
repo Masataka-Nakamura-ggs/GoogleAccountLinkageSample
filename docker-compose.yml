@@ -56,7 +56,6 @@ services:
       - KEYCLOAK_CLIENT_ID=gmo-coin-client
       - KEYCLOAK_CLIENT_SECRET=your-client-secret-here
       - KEYCLOAK_ISSUER=http://host.docker.internal:8080/realms/one-account-realm
-      # Next.jsサーバーからホストOS上のKeycloakにアクセスするためのURL
       - KEYCLOAK_INTERNAL_URL=http://host.docker.internal:8080/realms/one-account-realm
       - BACKEND_API_URL=http://localhost:8081
       - NODE_ENV=development
