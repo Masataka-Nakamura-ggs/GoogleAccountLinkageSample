@@ -48,3 +48,46 @@ Keycloakは、様々な方法で取得したユーザー情報を自身のデー
 
 * **IDトークン:** ユーザーが誰であるかを示す「身分証明書」。ユーザー情報（名前、メールアドレス等）が含まれます。
 * **アクセストークン:** ユーザーが何をして良いか（権限）を示す「通行許可証」。保護されたAPIへのアクセス時に利用します。
+
+
+**8.イメージ**
+### 顧客情報の連携
+```mermaid
+graph TD
+    
+    顧客(個人顧客)
+    subgraph Keycloak
+        顧客情報
+    end
+    subgraph 社内
+        oneaccount(OneAccount)
+    end
+    subgraph IDブローカー
+        google(Google)
+        x(X)
+        facebook(Facebook)
+    end
+
+    顧客 -- 1.ログイン --> oneaccount
+    oneaccount -. "2.認証・認可を委任" .-> Keycloak
+    IDブローカー <--3.顧客が連携を許可--> 顧客情報
+    顧客情報 -- 4.顧客情報取得 --> oneaccount
+```
+
+### 社員情報の連携
+```mermaid
+graph TD
+    
+    subgraph 社内
+        oneaccount(OneAccount)
+        ldap(LDAP)
+        社員(社員)
+        subgraph 社員情報
+            Keycloak
+        end
+    end
+
+    Keycloak <--社員情報連携--> ldap
+    oneaccount -.認証・認可を委任.-> Keycloak
+    社員 --ログイン-->Keycloak
+```
