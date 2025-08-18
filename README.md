@@ -6,9 +6,10 @@ OIDC(OpenID Connect)によるID連携を行うサンプルWebアプリケーシ�
 
 このプロジェクトは、Googleアカウント連携の代替として、Keycloak を使用したOIDC認証のサンプルアプリケーションです。以下の技術スタックを使用し、Docker Composeで一括して起動できます。
 
+- **OneAccountフロントエンド(RP)役 (OneAccount画面の代役):** React + Next.js 14 + Tailwind CSS
 - **IDプロバイダー(IdP)役 (OneAccount/GCIPの代役):** Keycloak 24.0.0
-- **バックエンド(RP)役 (GMOコインサーバーの代役):** Java + Spring Boot 3 + Gradle 8.5
-- **フロントエンド(RP)役 (GMOコイン画面の代役):** React + Next.js 14 + Tailwind CSS
+- **バックエンド(RP)役 (OneAccountサーバーの代役):** Java + Spring Boot 3 + Gradle 8.5
+- **GMOコインフロントエンド(RP)役 (GMOコイン画面の代役):** React + Next.js 14 + Tailwind CSS
 
 最終更新日: 2025年8月15日
 
@@ -22,10 +23,10 @@ graph TD
     Keycloak["Keycloak (IdP)<br>Port: 8080"]
 
 
-    OneAccount <--ログインボタン押下で<br>Keycloakの<br>ログイン画面に遷移--> Keycloak
-    GMOCoin <--ユーザ情報問い合わせ--> Backend
-    Backend <--ユーザ情報問い合わせ--> Keycloak
-    GMOCoin <--Keycloakログイン成功後に<br>GMO Coinの画面に遷移--> Keycloak
+    OneAccount --1.ログインボタン押下で<br>Keycloakの<br>ログイン画面に遷移--> Keycloak
+    Keycloak --2.Keycloakログイン成功後に<br>GMO Coinの画面に遷移--> GMOCoin
+    GMOCoin <-."3.ユーザ情報問い合わせ".-> Backend
+    Backend <-."4.ユーザ情報問い合わせ".-> Keycloak
 ```
 
 ## 前提条件
@@ -74,7 +75,7 @@ docker compose up -d --build
 ### OneAccountアプリ（別フロントエンド）
 
 http://localhost:3001 にアクセスすると、シンプルなログイン画面が表示されます。
-このアプリは、Keycloakと連携するセカンドフロントエンドとして動作し、
+このアプリは、Keycloakと連携するフロントエンドとして動作し、
 認証失敗時の遷移先としても利用できます。
 
 ### テストユーザー
@@ -221,18 +222,18 @@ GoogleAccountLinkageSample/
 ├── README.md
 ├── docker-compose.yml
 ├── .gitignore
-├── agent_logs/
+├── agent_logs/　　・・・GithubCopilotの作業ログです
 │   ├── 20250814_001_*.md
 │   └── 20250815_refactoring_*.md
-├── docs/
-│   ├── Issue/
+├── docs/　　　　　・・・このサンプルに関するドキュメントです
+│   ├── Issue/　　・・・GithubCopilotに指示を出した際の指示書です
 │   ├── 20250814_001.md
 │   ├── Googleアカウント連携.md
 │   ├── 20250814_001_nextauth_error_investigation.md
 │   └── 追加要望_20250815.md
-├── keycloak/
+├── keycloak/　　・・・Keycloakの設定です。docker-composeする際に読み込みます
 │   └── realm-export.json
-├── backend-api/
+├── backend-api/　・・・Keycloakに顧客情報を問い合わせるAPIエンドポイントです
 │   ├── Dockerfile
 │   ├── build.gradle
 │   ├── settings.gradle
@@ -245,7 +246,7 @@ GoogleAccountLinkageSample/
 │       │       ├── HealthCheckController.java
 │       │       └── UserInfoController.java
 │       └── resources/application.yml
-├── gmo-coin-app/
+├── gmo-coin-app/　・・・ 仮想GMOコインの画面です
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── next.config.js
@@ -276,7 +277,7 @@ GoogleAccountLinkageSample/
 │               ├── auth/route.ts
 │               ├── callback/route.ts
 │               └── user/route.ts
-└── oneaccount-app/
+└── oneaccount-app/　・・・仮想OneAccountの画面です
     ├── Dockerfile
     ├── package.json
     ├── next.config.js
